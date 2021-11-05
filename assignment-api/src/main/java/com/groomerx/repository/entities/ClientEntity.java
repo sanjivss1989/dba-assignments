@@ -1,15 +1,17 @@
 package com.groomerx.repository.entities;
 
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import lombok.Data;
+
+import javax.persistence.*;
 
 @Entity
 @Table(name = "CLIENT")
+@Data
 public class ClientEntity {
 
-    @Column(name = "ID")
+    @Id
+    @GeneratedValue(strategy= GenerationType.SEQUENCE)
     private int id;
 
     @Column(name = "NAME")

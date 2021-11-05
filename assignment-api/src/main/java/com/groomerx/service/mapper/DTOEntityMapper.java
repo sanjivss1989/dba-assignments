@@ -1,11 +1,19 @@
 package com.groomerx.service.mapper;
 
+import com.groomerx.dto.AppointmentDTO;
 import com.groomerx.dto.ScheduleDTO;
 import com.groomerx.dto.ScheduleViewResponseDTO;
+import com.groomerx.dto.ServicesDTO;
+import com.groomerx.repository.entities.AppointmentEntity;
+import com.groomerx.repository.entities.ClientEntity;
 import com.groomerx.repository.entities.ScheduleEntity;
+import com.groomerx.repository.entities.ServicesBookedEntity;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class DTOEntityMapper {
@@ -31,5 +39,60 @@ public class DTOEntityMapper {
         scheduleDTO.setFromTime(scheduleEntity.getFromTime().toString());
         scheduleDTO.setToTime(scheduleEntity.getToTime().toString());
         return scheduleDTO;
+    }
+
+    public static AppointmentEntity getAppointmentEntity(AppointmentDTO appointmentDTO){
+        AppointmentEntity appointmentEntity = new AppointmentEntity();
+        //appointmentEntity.setDate_created(new Timestamp(new Date().getTime()));
+        appointmentEntity.setCreatedBy(Integer.parseInt(appointmentDTO.getEmployeeCreated()));
+        appointmentEntity.setEmployeeID(Integer.parseInt(appointmentDTO.getEmployeeID()));
+        ClientEntity clientEntity = new ClientEntity();
+        clientEntity.setName(appointmentDTO.getClientName());
+        clientEntity.setContact(appointmentDTO.getClientContact());
+        clientEntity.setEmail(appointmentDTO.getClientEmail());
+        appointmentEntity.setClientEntity(clientEntity);
+        appointmentEntity.setClientName(appointmentDTO.getClientName());
+        appointmentEntity.setClientContact(appointmentDTO.getClientContact());
+        appointmentEntity.setServicesBookedEntityList(mapServicesBookedEntity(appointmentEntity,appointmentDTO.getServices()));
+        appointmentEntity.setStartTime(parseDateTime(appointmentDTO.getStartTime()));
+        appointmentEntity.setEndTime(parseDateTime(appointmentDTO.getEndTime()));
+        appointmentEntity.setEndTimeExpected(parseDateTime(appointmentDTO.getEndTimeExpected()));
+        appointmentEntity.setDiscount(Double.parseDouble(appointmentDTO.getDiscount()));
+        appointmentEntity.setPriceExpected(calculateEstimatedPrice(appointmentDTO.getServices()));
+        appointmentEntity.setPriceFull(calculateFullPrice(appointmentDTO.getServices()));
+        appointmentEntity.setPriceFinal(calculateFinalPriceDiscounted(appointmentDTO.getServices(),appointmentEntity.getDiscount()));
+        return appointmentEntity;
+    }
+
+    private static List<ServicesBookedEntity> mapServicesBookedEntity(AppointmentEntity appointmentEntity,List<ServicesDTO> servicesDTOList){
+        List<ServicesBookedEntity> servicesBookedEntityList = new ArrayList<>();
+        ServicesBookedEntity entity=null;
+        for(ServicesDTO servicesDTO:servicesDTOList){
+            entity = new ServicesBookedEntity();
+            entity.setAppointmentEntity(appointmentEntity);
+            entity.setServiceID(servicesDTO.getId());
+            entity.setPrice(servicesDTO.getPrice());
+           servicesBookedEntityList.add(entity);
+        }
+        return servicesBookedEntityList;
+    }
+
+    private static Double calculateFullPrice(List<ServicesDTO> servicesDTOList){
+        Double sum = 0.0;
+        for(ServicesDTO servicesDTO: servicesDTOList){
+            sum = sum+servicesDTO.getPrice();
+        }
+        return sum;
+    }
+
+    private static Double calculateEstimatedPrice(List<ServicesDTO> servicesDTOList){
+        Double roundedOff = 100.00;
+        return calculateFullPrice(servicesDTOList)+roundedOff;
+    }
+
+    private static Double calculateFinalPriceDiscounted(List<ServicesDTO> servicesDTOList,Double discount){
+       Double fullPrice = calculateFullPrice(servicesDTOList);
+       Double finalPrice = fullPrice - (fullPrice*discount/100);
+       return finalPrice;
     }
 }

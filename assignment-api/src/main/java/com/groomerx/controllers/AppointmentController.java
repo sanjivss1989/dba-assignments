@@ -4,6 +4,7 @@ import com.groomerx.dto.*;
 import com.groomerx.service.IAppointmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +35,9 @@ public class AppointmentController {
         return ResponseEntity.ok(apiResponse);
     }
 
-    public ResponseEntity<AppointmentCreatedResponseDTO> createAppointment(AppointmentDTO appointmentDTO){
-        return ResponseEntity.ok(null);
+    @PostMapping(value = "/v1/appointment")
+    public ResponseEntity<AppointmentCreatedResponseDTO> createAppointment(@RequestBody AppointmentDTO appointmentDTO){
+        AppointmentCreatedResponseDTO responseDTO = service.scheduleAppointment(appointmentDTO);
+        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 }

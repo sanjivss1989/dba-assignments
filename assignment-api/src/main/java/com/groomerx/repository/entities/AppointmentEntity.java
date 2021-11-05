@@ -1,21 +1,28 @@
 package com.groomerx.repository.entities;
 
+import lombok.Data;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Table(name = "APPOINTMENT_DETAILS")
+@Data
 public class AppointmentEntity {
 
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE)
     private int id;
 
-    @Column(name="DATE_CREATED")
-    private Timestamp date_created;
+//    @Column(name="DATE_CREATED")
+//    private Timestamp date_created;
 
-    @Column(name = "EMPLOYEE_CREATED")
-    private int employee_created;
+    @Column(name = "CREATED_BY")
+    private int createdBy;
+
+    @Column(name = "EMPLOYEE_ID")
+    private int employeeID;
 
     @Column(name = "CLIENT_NAME")
     private String clientName;
@@ -50,9 +57,12 @@ public class AppointmentEntity {
     @Column(name = "CANCELLED_NOTE")
     private String cancelledNote;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "CLIENT_ID")
     private ClientEntity clientEntity;
+
+    @OneToMany(mappedBy = "appointmentEntity", cascade = CascadeType.ALL)
+    private List<ServicesBookedEntity> servicesBookedEntityList;
 
 
 

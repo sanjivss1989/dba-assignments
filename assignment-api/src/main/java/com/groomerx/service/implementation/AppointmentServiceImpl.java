@@ -4,7 +4,9 @@ import com.groomerx.dto.AppointmentCreatedResponseDTO;
 import com.groomerx.dto.AppointmentDTO;
 import com.groomerx.dto.ScheduleDTO;
 import com.groomerx.dto.ScheduleViewResponseDTO;
+import com.groomerx.repository.AppointmentRepository;
 import com.groomerx.repository.ScheduleRepository;
+import com.groomerx.repository.entities.AppointmentEntity;
 import com.groomerx.repository.entities.ScheduleEntity;
 import com.groomerx.service.IAppointmentService;
 import com.groomerx.service.mapper.DTOEntityMapper;
@@ -17,16 +19,20 @@ import java.util.List;
 @Service
 public class AppointmentServiceImpl implements IAppointmentService {
 
-    private ScheduleRepository scheduleRepository;
+    private final ScheduleRepository scheduleRepository;
+    private final AppointmentRepository appointmentRepository;
 
     @Autowired
-    public AppointmentServiceImpl( ScheduleRepository scheduleRepository){
+    public AppointmentServiceImpl(ScheduleRepository scheduleRepository, AppointmentRepository appointmentRepository){
         this.scheduleRepository=scheduleRepository;
+        this.appointmentRepository = appointmentRepository;
     }
     @Override
     public AppointmentCreatedResponseDTO scheduleAppointment(AppointmentDTO appointmentDTO) {
-
-        return null;
+        AppointmentEntity entity = appointmentRepository.save(DTOEntityMapper.getAppointmentEntity(appointmentDTO));
+        AppointmentCreatedResponseDTO obj = new AppointmentCreatedResponseDTO();
+        obj.setAppointmentID(String.valueOf(entity.getId()));
+        return obj;
     }
 
     @Override
