@@ -1,9 +1,6 @@
 package com.groomerx.service.mapper;
 
-import com.groomerx.dto.AppointmentDTO;
-import com.groomerx.dto.ScheduleDTO;
-import com.groomerx.dto.ScheduleViewResponseDTO;
-import com.groomerx.dto.ServicesDTO;
+import com.groomerx.dto.*;
 import com.groomerx.repository.entities.AppointmentEntity;
 import com.groomerx.repository.entities.ClientEntity;
 import com.groomerx.repository.entities.ScheduleEntity;
@@ -75,6 +72,31 @@ public class DTOEntityMapper {
            servicesBookedEntityList.add(entity);
         }
         return servicesBookedEntityList;
+    }
+
+    public static List<AppointmentViewResponseDTO> getAllAppointments(List<AppointmentEntity> entities){
+        List<AppointmentViewResponseDTO> appointmentViewResponseDTOList = new ArrayList<>();
+        AppointmentViewResponseDTO dto =null;
+         for(AppointmentEntity entity: entities){
+             dto = new AppointmentViewResponseDTO();
+             dto.setAppointmentID(String.valueOf(entity.getId()));
+             dto.setScheduledBy(String.valueOf(entity.getCreatedBy()));
+             dto.setAssignedTo(String.valueOf(entity.getEmployeeID()));
+             dto.setClientName(entity.getClientName());
+             dto.setScheduledAt(entity.getStartTime().toString());
+             appointmentViewResponseDTOList.add(dto);
+         }
+         return appointmentViewResponseDTOList ;
+    }
+
+    public static AppointmentViewResponseDTO getDetails(AppointmentEntity entity){
+        AppointmentViewResponseDTO responseDTO = new AppointmentViewResponseDTO();
+        responseDTO.setScheduledBy(String.valueOf(entity.getCreatedBy()));
+        responseDTO.setAppointmentID(String.valueOf(entity.getId()));
+        responseDTO.setAssignedTo(String.valueOf(entity.getEmployeeID()));
+        responseDTO.setClientName(entity.getClientName());
+        responseDTO.setScheduledAt(entity.getStartTime().toString());
+        return responseDTO;
     }
 
     private static Double calculateFullPrice(List<ServicesDTO> servicesDTOList){

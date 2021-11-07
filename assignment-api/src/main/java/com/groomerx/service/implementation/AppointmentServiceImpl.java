@@ -1,9 +1,6 @@
 package com.groomerx.service.implementation;
 
-import com.groomerx.dto.AppointmentCreatedResponseDTO;
-import com.groomerx.dto.AppointmentDTO;
-import com.groomerx.dto.ScheduleDTO;
-import com.groomerx.dto.ScheduleViewResponseDTO;
+import com.groomerx.dto.*;
 import com.groomerx.repository.AppointmentRepository;
 import com.groomerx.repository.ScheduleRepository;
 import com.groomerx.repository.entities.AppointmentEntity;
@@ -15,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AppointmentServiceImpl implements IAppointmentService {
@@ -49,4 +47,19 @@ public class AppointmentServiceImpl implements IAppointmentService {
         }
         return scheduleViewResponseDTOS;
     }
+
+    @Override
+    public List<AppointmentViewResponseDTO> browseAppointments() {
+        List<AppointmentEntity> entityList = appointmentRepository.findAll();
+        return DTOEntityMapper.getAllAppointments(entityList);
+    }
+
+    @Override
+    public AppointmentViewResponseDTO searchAppointment(Integer id) {
+        System.out.println("integer ---"+id);
+        Optional<AppointmentEntity> output = appointmentRepository.findById(id);
+        return output.map(DTOEntityMapper::getDetails).orElse(null);
+    }
+
+
 }
